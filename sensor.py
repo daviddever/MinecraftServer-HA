@@ -6,6 +6,7 @@ import logging
 from homeassistant.helpers.entity import Entity
 ATTR_PING = 'Ping'
 ATTR_USERS = 'Users Online'
+ATTR_MAX = 'Maximum Users'
 ATTR_MOTD = 'MOTD'
 ATTR_VERSION = 'Version'
 ICON = 'mdi:minecraft'
@@ -58,11 +59,12 @@ class MCServerSensor(Entity):
         """Update device state."""
         status = self._mcserver.lookup(self._server).status()
         query = self._mcserver.lookup(self._server).query()
-        self._state = str(status.players.online) + '/' + str(status.players.max)
+        self._state = status.players.online
         self._ping = status.latency
         self._users = query.players.names
         self._motd = query.motd
         self._version = query.software.version
+        self._players_max = status.players.max
 
 
     @property
@@ -71,6 +73,7 @@ class MCServerSensor(Entity):
         return {
        ATTR_PING: self._ping,
        ATTR_USERS: self._users,
+       ATTR_MAX: self._players_max,
        ATTR_MOTD: self._motd,
        ATTR_VERSION: self._version
         }
